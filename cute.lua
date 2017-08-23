@@ -62,44 +62,32 @@ end
 
 local minions = {}
 
-minion = function (name, tbl, k)
+function cute.minion(name, tbl, k)
   print("creating minion...")
   print(k)
-  minions[name] = {
+  local minion = {
     table=tbl,
     key=k,
     callback = tbl[k],
     calls = 0,
     args = {}
   }
+  minions[name] = minion
   tbl[k] =  function (...)
     local arguments = {...}
-    minions[name].calls = minions[name].calls + 1
+    minion.calls = minion.calls + 1
     table.insert(minions[name].args, arguments)
-    return minions[name].callback(unpack(arguments))
+    return minion.callback(...)
   end
-
-  return {
-    nobbleReturnValue= function (val)
-      tbl[k] = function (...)
-        -- TODO: 1, 2, refactor!
-        local arguments = {...}
-        minions[name].calls = minions[name].calls + 1
-        table.insert(minions[name].args, arguments)
-        return val
-      end
-    end
-  }
 end
 
-report = function(name)
+function cute.report(name)
   return minions[name]
 end
 
-local resetMinions = function ()
-  for name, _ in pairs(minions) do
+local function resetMinions()
+  for name, minion in pairs(minions) do
     print("reseting minion: " .. name)
-    local minion = minions[name]
     minion.table[minion.key] = minion.callback
   end
   minions = {}
@@ -128,7 +116,7 @@ end
 
 -- controls
 
-local keypressed = function (key)
+function cute.keypressed(key)
   if not enabled then return end
 
   if key == hideKey then show = not show end
@@ -212,14 +200,14 @@ end
 
 -- Testing functions
 
-notion = function (title, testMethod)
+function cute.notion(title, testMethod)
   table.insert(tests, {
     title=title,
     run=testMethod
   })
 end
 
-f_notion = function (title, testMethod)
+function cute.f_notion(title, testMethod)
   table.insert(focusTests, {
     title=title,
     run=testMethod,
@@ -227,8 +215,7 @@ f_notion = function (title, testMethod)
   })
 end
 
-
-x_notion = function (title, testMethod)
+function cute.x_notion(title, testMethod)
   -- do nothing
 end
 
@@ -265,7 +252,7 @@ local _shallowMatches = function (testTable, refTable)
   return true
 end
 
-check = function (testVal)
+function cute.check(testVal)
   return {
     is = function (refVal) _is(testVal, refVal) end,
     shallowMatches = function (refTable) _shallowMatches(testVal, refTable) end
@@ -274,7 +261,7 @@ end
 
 -- options and running
 
-cute.go = function (args)
+function cute.go(args)
   local shouldGo = false
   local headless = false
   for i, arg in ipairs(args) do
@@ -294,9 +281,8 @@ cute.go = function (args)
   end
 end
 
-cute.draw = function () display(love.graphics) end
-cute.keypressed = keypressed
-cute.setKeys = function (hide, down, up)
+function cute.draw() display(love.graphics) end
+function cute.setKeys(hide, down, up)
   hideKey = hide
   downKey = down
   upKey = up
