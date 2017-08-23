@@ -25,7 +25,7 @@ getAllFiles = function(folder, allFiles)
   allFiles = allFiles or {}
   local lfs = love.filesystem
   local filesTable = lfs.getDirectoryItems(folder)
-  for i,v in ipairs(filesTable) do
+  for _,v in ipairs(filesTable) do
     local file = folder .. "/" .. v
     if lfs.isFile(file) then
       table.insert(allFiles, file)
@@ -37,7 +37,7 @@ getAllFiles = function(folder, allFiles)
 end
 
 local addTests = function (files)
-  for i, f in ipairs(files) do
+  for _, f in ipairs(files) do
     if stringEnds(f, "_tests.lua") then
       local chunk = love.filesystem.load(f)
       chunk()
@@ -95,7 +95,7 @@ end
 
 local runAllTests = function (headlessMode)
   print("running tests...")
-  for i, test in ipairs(getTests()) do
+  for _, test in ipairs(getTests()) do
     print(test.title)
     local passed, errorMsg = pcall(test.run)
     resetMinions()
@@ -158,7 +158,7 @@ local _drawResultsBox = function(g, w, h)
     'center')
 end
 
-local _drawLine = function(g, i, offset, test)
+local _drawLine = function(g, i, ofs, test)
   local msg
   if test.focused then
     msg = "FOCUSED "
@@ -172,12 +172,11 @@ local _drawLine = function(g, i, offset, test)
     _setColour("red", g)
     msg = msg .. "Failed: " .. test.title .. " - " .. tostring(test.errorMsg)
   end
-  g.print(msg, padding + margin, (padding * 1.5) + margin * 2 + (i - 1 - offset)*14)
+  g.print(msg, padding + margin, (padding * 1.5) + margin * 2 + (i - 1 - ofs)*14)
 end
 
-local _drawResults = function(g, w, h)
+local _drawResults = function(g)
   for i, test in ipairs(getTests()) do
-    local msg
     if offset == #getTests() then break end
     if i > offset then
       _drawLine(g, i, offset, test)
@@ -194,7 +193,7 @@ local display = function (g)
 
   g.push('all')
   _drawResultsBox(g, w, h)
-  _drawResults(g, w, h)
+  _drawResults(g)
   g.pop()
 end
 
@@ -215,7 +214,7 @@ function cute.f_notion(title, testMethod)
   })
 end
 
-function cute.x_notion(title, testMethod)
+function cute.x_notion()
   -- do nothing
 end
 
@@ -264,7 +263,7 @@ end
 function cute.go(args)
   local shouldGo = false
   local headless = false
-  for i, arg in ipairs(args) do
+  for _, arg in ipairs(args) do
     if arg == "--cute" then
       shouldGo = true
     end
