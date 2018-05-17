@@ -132,10 +132,10 @@ end
 
 local _setColour = function (colour, g)
   local colours = {
-    green = {122,158,53},
-    black = {45,45,45},
-    red = {170, 57, 57},
-    lightGrey = {238,238,238, 200}
+    green = {0.478, 0.620, 0.208},
+    black = {0.176, 0.176, 0.176},
+    red = {0.667, 0.224, 0.224},
+    lightGrey = {0.933, 0.933, 0.933, 0.784}
   }
 
   g.setColor(unpack(colours[colour]))
