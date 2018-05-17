@@ -27,9 +27,10 @@ getAllFiles = function(folder, allFiles)
   local filesTable = lfs.getDirectoryItems(folder)
   for _,v in ipairs(filesTable) do
     local file = folder .. "/" .. v
-    if lfs.isFile(file) then
+    local info = lfs.getInfo(file)
+	if info.type == "file" or info.type == "symlink" then
       table.insert(allFiles, file)
-    elseif lfs.isDirectory(file) then
+    elseif info.type == "directory" then
       getAllFiles(file, allFiles)
     end
   end
