@@ -228,7 +228,7 @@ local _is = function (testVal, refVal)
   return true
 end
 
-local _shallowMatches = function (testTable, refTable)
+local function checkSizes(testTable, refTable)
   if #testTable ~= #refTable then
     local t1 = "t1: "
     local t2 = "t2: "
@@ -240,6 +240,10 @@ local _shallowMatches = function (testTable, refTable)
     end
     error("Tables are different sizes: " .. t1 .. " | " .. "t2", 3)
   end
+end
+
+local _shallowMatches = function (testTable, refTable)
+  checkSizes(testTable, refTable)
 
   for k, item in pairs(testTable) do
     if item ~= refTable[k] then
@@ -252,10 +256,33 @@ local _shallowMatches = function (testTable, refTable)
   return true
 end
 
+local _sameValues = function (testTable, refTable)
+  checkSizes(testTable, refTable)
+  
+  local bag = {}
+  for _, v in pairs(refTable) do
+    bag[v] = (bag[v] or 0) + 1
+  end
+  
+  for _, v in pairs(testTable) do
+    local n = bag[v]
+    if not n then
+      error("Mismatch for element with value " .. tostring(v))
+    end
+    bag[v] = n > 1 and n - 1 or nil
+  end
+  for k, _ in pairs(bag) do
+    error("Mismatch for element with value " .. tostring(k))
+  end
+  
+  return true
+end
+
 function cute.check(testVal)
   return {
     is = function (refVal) _is(testVal, refVal) end,
-    shallowMatches = function (refTable) _shallowMatches(testVal, refTable) end
+    shallowMatches = function (refTable) _shallowMatches(testVal, refTable) end,
+    sameValues = function (refTable) _sameValues(testVal, refTable) end
   }
 end
 
